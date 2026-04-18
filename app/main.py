@@ -4,7 +4,7 @@ import sys
 
 from openai import OpenAI
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY",default='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')
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
 
 
@@ -30,7 +30,7 @@ def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
     # TODO: Uncomment the following line to pass the first stage
-    # print(chat.choices[0].message.content)
+    print(chat.choices[0].message.content)
 
 
 if __name__ == "__main__":
