@@ -48,26 +48,33 @@ def main():
 
         # You can use print statements as follows for debugging, they'll be visible when running tests.
         print("Logs from your program will appear here!", file=sys.stderr)
+        assistant_message = {
+            "role": "assistant",
+            "content": chat.choices[0].message.content,
+            "tool_calls": chat.choices[0].message.tool_calls,
+        }
+        message.append(assistant_message)
 
         # TODO: Uncomment the following line to pass the first stage
         if chat.choices[0].message.tool_calls:
             tool_calls = chat.choices[0].message.tool_calls
             if tool_calls:
-                tool_call = tool_calls[0]
-                if tool_call.type == "function":
-                    if tool_call.function.name == "Read":
-                        import json
-                        json_arg = tool_call.function.arguments
-                        arg_dict=json.loads(json_arg)
-                        path=arg_dict.get("file_path")
-                        with open(path,"r") as f:
-                            data=f.read()
-                            tool_ms={
-                                'role': 'tool',
-                                'tool_use_id': tool_call.id,
-                                'content': data
-                            }
-                            message.append(tool_ms)
+                # tool_call = tool_calls[0]
+                for tool_call in tool_calls:
+                    if tool_call.type == "function":
+                        if tool_call.function.name == "Read":
+                            import json
+                            json_arg = tool_call.function.arguments
+                            arg_dict=json.loads(json_arg)
+                            path=arg_dict.get("file_path")
+                            with open(path,"r") as f:
+                                data=f.read()
+                                tool_ms={
+                                    'role': 'tool',
+                                    'tool_call_id': tool_call.id,
+                                    'content': data
+                                }
+                                message.append(tool_ms)
         else:
             print(chat.choices[0].message.content)
             stop=True
