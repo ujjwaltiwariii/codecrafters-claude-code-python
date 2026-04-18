@@ -136,7 +136,7 @@ def main():
                             json_arg = tool_call.function.arguments
                             arg_dict=json.loads(json_arg)
                             cmd=arg_dict.get("command")
-                            path=Path(__file__).parent.parent.resolve()
+                            path=Path.cwd()
                             result=subprocess.run(cmd, shell=True,cwd=path,capture_output=True)
                             if result.returncode != 0:
                                 tool_ms = {
