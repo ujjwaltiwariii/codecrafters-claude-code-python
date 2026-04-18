@@ -3,6 +3,7 @@ import os
 import sys
 
 from openai import OpenAI
+from openai.types.chat import ChatCompletionFunctionToolParam
 
 API_KEY = os.getenv("OPENROUTER_API_KEY",default='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')
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -39,7 +40,28 @@ def main():
                             },
                             "required": ["file_path"]
                     }
-                }}
+                }},
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "Write",
+                        "description": "Write content to a file",
+                        "parameters": {
+                            "type": "object",
+                            "required": ["file_path", "content"],
+                            "properties": {
+                                "file_path": {
+                                    "type": "string",
+                                    "description": "The path of the file to write to"
+                                },
+                                "content": {
+                                    "type": "string",
+                                    "description": "The content to write to the file"
+                                }
+                            }
+                        }
+                    }
+                }
             ]
         )
 
@@ -69,6 +91,20 @@ def main():
                             path=arg_dict.get("file_path")
                             with open(path,"r") as f:
                                 data=f.read()
+                                tool_ms={
+                                    'role': 'tool',
+                                    'tool_call_id': tool_call.id,
+                                    'content': data
+                                }
+                                message.append(tool_ms)
+                        if tool_call.function.name == "Write":
+                            import json
+                            json_arg = tool_call.function.arguments
+                            arg_dict=json.loads(json_arg)
+                            path=arg_dict.get("file_path")
+                            content=arg_dict.get("content")
+                            with open(path,"w") as f:
+                                data=f.write(content)
                                 tool_ms={
                                     'role': 'tool',
                                     'tool_call_id': tool_call.id,
