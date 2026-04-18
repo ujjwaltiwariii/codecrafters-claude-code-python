@@ -64,7 +64,7 @@ def main():
                             data=f.read()
                             tool_ms={
                                 'role': 'tool',
-                                'tool_call_id': tool_call.id,
+                                'tool_use_id': tool_call.id,
                                 'content': data
                             }
                             message.append(tool_ms)
