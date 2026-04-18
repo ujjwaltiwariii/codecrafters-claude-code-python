@@ -149,7 +149,7 @@ def main():
                                 tool_ms={
                                     'role': 'tool',
                                     'tool_call_id': tool_call.id,
-                                    'content': result.stdout
+                                    'content': result.stderr.decode("utf-8")
                                 }
                                 message.append(tool_ms)
         else:
