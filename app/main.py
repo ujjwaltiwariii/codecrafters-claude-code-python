@@ -1,6 +1,8 @@
 import argparse
 import os
+import subprocess
 import sys
+from pathlib import Path
 
 from openai import OpenAI
 from openai.types.chat import ChatCompletionFunctionToolParam
@@ -61,7 +63,25 @@ def main():
                             }
                         }
                     }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "Bash",
+                        "description": "Execute a shell command",
+                        "parameters": {
+                            "type": "object",
+                            "required": ["command"],
+                            "properties": {
+                                "command": {
+                                    "type": "string",
+                                    "description": "The command to execute"
+                                }
+                            }
+                        }
+                    }
                 }
+
             ]
         )
 
@@ -111,6 +131,26 @@ def main():
                                     'content': "Successfully wrote to file"
                                 }
                                 message.append(tool_ms)
+                        if tool_call.function.name == "Bash":
+                            import json
+                            json_arg = tool_call.function.arguments
+                            arg_dict=json.loads(json_arg)
+                            cmd=arg_dict.get("command")
+                            path=Path(__file__).parent.resolve()
+                            result=subprocess.run(cmd, shell=True,cwd=path)
+                            if result.returncode != 0:
+                                tool_ms = {
+                                    'role': 'tool',
+                                    'tool_call_id': tool_call.id,
+                                    'content': f"command failed with exit code {result.returncode} and error message {result.stderr}"
+                                }
+                                message.append(tool_ms)
+                            tool_ms={
+                                'role': 'tool',
+                                'tool_call_id': tool_call.id,
+                                'content': result.stdout
+                            }
+                            message.append(tool_ms)
         else:
             print(chat.choices[0].message.content)
             stop=True
