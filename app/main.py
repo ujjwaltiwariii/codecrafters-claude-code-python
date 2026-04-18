@@ -104,11 +104,11 @@ def main():
                             path=arg_dict.get("file_path")
                             content=arg_dict.get("content")
                             with open(path,"w") as f:
-                                data=f.write(content)
+                                f.write(content)
                                 tool_ms={
                                     'role': 'tool',
                                     'tool_call_id': tool_call.id,
-                                    'content': data
+                                    'content': "Successfully wrote to file"
                                 }
                                 message.append(tool_ms)
         else:
