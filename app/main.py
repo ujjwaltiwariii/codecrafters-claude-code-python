@@ -145,12 +145,13 @@ def main():
                                     'content': f"command failed with exit code {result.returncode} and error message {result.stderr}"
                                 }
                                 message.append(tool_ms)
-                            tool_ms={
-                                'role': 'tool',
-                                'tool_call_id': tool_call.id,
-                                'content': result.stdout
-                            }
-                            message.append(tool_ms)
+                            else:
+                                tool_ms={
+                                    'role': 'tool',
+                                    'tool_call_id': tool_call.id,
+                                    'content': result.stdout
+                                }
+                                message.append(tool_ms)
         else:
             print(chat.choices[0].message.content)
             stop=True
